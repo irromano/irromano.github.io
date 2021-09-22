@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+/*// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
 import * as rtdb from "https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js";
@@ -28,18 +28,40 @@ rtdb.onValue(titleRef, ss =>
 {
     alert(JSON.stringify(ss.val()));
 });
+*/
 
+let database = new testDataBase;
+alert(JSON.stringify(database.getAll()));
+database.pushMessage("New Message");
+alert(JSON.stringify(database.getMessages()));
 
 //Button Logic
-const btn = document.querySelector('.btn');
-var chat = document.querySelector('#chat');
+let sendBtn = document.querySelector('#send');
+let signInBtn = document.querySelector('#signIn');
+let chat = document.querySelector('#chat');
+let usernameTxt = document.querySelector('#signInText');
+let usernameLabel = document.querySelector('#username');
 
-btn.addEventListener('click', function ()
+signInBtn.addEventListener('click', function ()
+{
+
+    let inputText = usernameTxt.value;
+    usernameLabel.innerHTML = inputText;
+    signInBtn.style.visibility = 'hidden';
+    usernameTxt.style.visibility = 'hidden';
+
+
+    //alert(`you changed the theme to ${className}`);fewaf
+
+});
+
+sendBtn.addEventListener('click', function ()
 {
 
     let inputText = document.querySelector('#userchat').value;
 
-    var li = document.createElement("li");
+
+    let li = document.createElement("li");
     li.appendChild(document.createTextNode(inputText));
     chat.appendChild(li);
 
