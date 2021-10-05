@@ -46,15 +46,21 @@ li {
   top: 20px;
   left: 250px;
   height: 50px;
-  width: 50px;
+  width: 200px;
   border-radius: 50%;
-  border: none;
+  border: rebeccapurple;
   color: var(--btnFontColor);
   background-color: var(--btnBg);
 }
-.btn:focus { outline-style: none; }
+.btn:focus { outline-style: ridge; }
 
-.utilbar {
+#header {
+  position: fixed; 
+  top: 0px; 
+  left: 40px; 
+}
+
+#footer {
   position: fixed; 
   bottom: 0px; 
   left: 40px; 

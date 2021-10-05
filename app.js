@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
 import * as rtdb from "https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -25,8 +26,20 @@ const analytics = getAnalytics(app);
 let db = rtdb.getDatabase(app);
 const titleRef = rtdb.ref(db, "/");
 const mesgRef = rtdb.ref(db, "/chats");
+const chat = document.querySelector("#chat");
+const app = document.querySelector("#app");
 
-const chat = document.querySelector('#chat');
+
+let renderUser = function (userObj)
+{
+    let logout = document.querySelector("#logout");
+    app.html(JSON.stringify(userObj));
+    app.append(`<button type="button" id="logout">Logout</button>`);
+    logout.on("click", () =>
+    {
+        fbauth.signOut(auth);
+    })
+}
 
 rtdb.onValue(titleRef, ss =>
 {
@@ -44,9 +57,9 @@ rtdb.onValue(titleRef, ss =>
 });
 
 //Button Logic
-const btn = document.querySelector('#send');
+const sendBtn = document.querySelector('#send');
 
-btn.addEventListener('click', function ()
+sendBtn.addEventListener('click', function ()
 {
 
     let inputText = document.querySelector('#userchat').value;
@@ -62,15 +75,50 @@ btn.addEventListener('click', function ()
 
 });
 
-signInBtn.addEventListener('click', function ()
+const resgisterBtn = document.querySelector("#register");
+
+resgisterBtn.addEventListener("click", function ()
+{
+    let username = document.querySelector("#regemail").val();
+    let pwd1 = document.querySelector("#regpass1").val();
+    let pwd2 = document.querySelector("#regpass2").val();
+    if (pwd1 != pwd2)
+    {
+        alert("Passwords don't match");
+        return;
+    }
+    fbauth.createUserWithEmailAndPassword(auth, username, pwd1).then(somedata =>
+    {
+        let uid = somedata.user.uid;
+        let userRoleRef = rtdb.ref(db, `/users/${uid}/roles/user`);
+        rtdb.set(userRoleRef, true);
+    }).catch(function (error)
+    {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode);
+        console.log(errorMessage);
+    });
+});
+
+const signInBtn = document.querySelector("#signIn");
+
+signInBtn.addEventListener("click", function ()
 {
 
-    let inputText = usernameTxt.value;
-    usernameLabel.innerHTML = inputText;
-    signInBtn.style.visibility = 'hidden';
-    usernameTxt.style.visibility = 'hidden';
-
-
-    //alert(`you changed the theme to ${className}`);fewaf
-
+    let username = document.querySelector("#signInUsername").val();
+    let pwd = document.querySelector("#signInPassword");
+    fbauth.signInWithEmailAndPassword(auth, username, pwd).then(
+        somedata =>
+        {
+            console.log(somedata);
+        }).catch(function (error)
+        {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
+        });
 });

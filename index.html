@@ -10,18 +10,26 @@
 </head>
 
 <body class=light-theme>
-  <div class="header">
+  <div class="utilbar" id="header1">
+    <input type="text" id="signInUsername">
+    <input type="text" id="signInPassword">
     <button class="btn" id="signIn">Sign in</button>
-    <input type="text" id="signInText">
     <label id="username"></label>
   </div>
-  <div>
+  <div class="utilbar" id="header2">
+    <input type="text" id="registerUsername">
+    <input type="text" id="registerPassword1">
+    <input type="text" id="registerPassword2">
+    <button class="btn" id="register">Register</button>
+  </div>
+  <div id="app">
     <h1>This is a chat app</h1>
+    <h2>Please login</h2>
     <p id="mesgSubtitle">Current messeges:</p>
     <ul id="chat">
     </ul>
   </div>
-  <div class="utilbar">
+  <div class="utilbar" id="footer">
     <button class="btn" id="send">Send</button>
     <input type="text" id="userchat" placeholder="Type something here">
     <p id="display"></p>
