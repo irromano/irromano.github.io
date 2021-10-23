@@ -1,41 +1,157 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Website</title>
-  <link rel="stylesheet" href="main.css">
+    <meta charset="utf-8" />
+    <title>ChatApp2</title>
+    <style type="text/css">
+        .auto-style1 {
+            width: 100%;
+        }
+
+        .auto-style2 {
+            height: 17px;
+        }
+
+        .auto-style5 {
+            width: 201px;
+        }
+
+        .auto-style6 {
+            height: 17px;
+            width: 201px;
+        }
+
+        .auto-style7 {
+            width: 240px;
+        }
+
+        .auto-style8 {
+            height: 17px;
+            width: 240px;
+        }
+
+        .auto-style9 {
+            width: 200px;
+        }
+
+        .auto-style10 {
+            height: 17px;
+            width: 200px;
+        }
+
+        .auto-style11 {
+            height: 23px;
+        }
+
+        .auto-style12 {
+            height: 23px;
+            width: 1384px;
+        }
+
+        #footer {
+            width: 100%;
+            height: 63px;
+            bottom: 0px;
+        }
+
+        #footerTable {
+            position: absolute;
+            bottom: 0px;
+        }
+
+        .auto-style13 {
+            bottom: 38px;
+            width: 755px;
+        }
+
+        .auto-style14 {
+            width: 404px;
+        }
+
+        .auto-style15 {
+            width: 240px;
+            height: 22px;
+        }
+    </style>
 </head>
 
-<body class=light-theme>
-  <div class="utilbar" id="header1">
-    <input type="text" id="signInUsername">
-    <input type="text" id="signInPassword">
-    <button class="btn" id="signIn">Sign in</button>
-    <label id="username"></label>
-  </div>
-  <div class="utilbar" id="header2">
-    <input type="text" id="registerUsername">
-    <input type="text" id="registerPassword1">
-    <input type="text" id="registerPassword2">
-    <button class="btn" id="register">Register</button>
-  </div>
-  <div id="app">
-    <h1>This is a chat app</h1>
-    <h2>Please login</h2>
-    <p id="mesgSubtitle">Current messeges:</p>
-    <ul id="chat">
-    </ul>
-  </div>
-  <div class="utilbar" id="footer">
-    <button class="btn" id="send">Send</button>
-    <input type="text" id="userchat" placeholder="Type something here">
-    <p id="display"></p>
-  </div>
-  <script type="module" src="app.js"></script>
-  <noscript>Javascript appears to be disabled</noscript>
+<body>
+    <div>
+        <table class="auto-style1">
+            <tr>
+                <td></td>
+                <td>
+                    <div>
+                        <table class="auto-style1" id="loginTable">
+                            <tr id="welcomeRow">
+                                <td class="auto-style15">Welcome. Please log-in:</td>
+                            </tr>
+                            <tr class="loginRow">
+                                <td class="auto-style7">
+                                    <input id="loginUser" type="text" autofocus="autofocus" />
+                                </td>
+                                <td class="auto-style5">
+                                    <input id="loginPass" type="password" />
+                                </td>
+                                <td class="auto-style9">
+                                    <input id="loginBtn" type="button" value="login" />
+                                </td>
+                            </tr>
+                            <tr class="loginRow">
+                                <td class="auto-style8">Dont have an account? Sign-up here:</td>
+                                <td class="auto-style6"></td>
+                                <td class="auto-style10"></td>
+                            </tr>
+                            <tr class="loginRow">
+                                <td class="auto-style8">
+                                    <input id="regUser" type="text" />
+                                </td>
+                                <td class="auto-style6">
+                                    <input id="regPass1" type="password" />
+                                </td>
+                                <td class="auto-style10">
+                                    <input id="regPass2" type="password" />
+                                </td>
+                                <td class="auto-style2">
+                                    <input id="regBtn" type="button" value="register" />
+                                </td>
+                            </tr>
+                            <tr id="userDataRow"></tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <table id="chat"></table>
+
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <div id="footer">
+                        <table id="footerTable" class="auto-style13">
+                            <tr>
+                                <td class="auto-style12">
+                                    <input id="sendText" type="text" class="auto-style14" />
+                                </td>
+                                <td class="auto-style11">
+                                    <input id="sendBtn" type="button" value="send" />
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script src="node_modules\jquery\dist\jquery.min.js"></script>
+    <script type="module" src="database.js"></script>
+    <noscript>Javascript appears to be disabled</noscript>
 </body>
 
 </html>
