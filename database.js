@@ -26,23 +26,35 @@ let auth = fbauth.getAuth(app);
 
 let db = rtdb.getDatabase(app);
 const titleRef = rtdb.ref(db, "/");
-const mesgRef = rtdb.ref(db, "/chats");
-const chat = document.querySelector("#chat");
+const chatTable = document.querySelector("#chatTable");
 let uid;
 let email;
+let usr;
+let chat;
 
 $("#footerTable").hide();
+//$("#chat").hide();
 
 let renderUser = function (userObj)
 {
-    $("#userDataRow").html(JSON.stringify(userObj));
-    $("#userDataRow").append(`<button type="button" id="logout">Logout</button>`);
-    $("#loginBtn").on("click", () =>
-    {
+    //$("#userDataRow").html(JSON.stringify(userObj));
+    $("#userDataRow").append(`<button type="button" id="logoutBtn">Logout</button>`);
+    $("#userDataRow").append(`<button type="button" id="changeUsernameBtn">Change Username</button>`);
+    $("#userDataRow").append(`<input id="changeUsernameInput" type="text"/>`);
+    $("#logoutBtn").on("click", () => {
         fbauth.signOut(auth);
+    });
+    $("#changeUsernameBtn").on("click", () => {
+        usr = $("#changeUsernameInput").val();
+        if (usr) {
+            let usernameRef = rtdb.ref(db, `/users/${uid}/username`);
+            rtdb.set(usernameRef, usr);
+        }
     })
     uid = userObj["uid"];
     email = userObj["email"];
+    usr = userObj["displayName"] ? userObj["displayName"] : email;
+    chat = "main"
 }
 
 fbauth.onAuthStateChanged(auth, user =>
@@ -51,20 +63,23 @@ fbauth.onAuthStateChanged(auth, user =>
     {
         renderUser(user);
         $(".loginRow").hide();
-        $("#chat").show();
+        $("#chatTable").show();
         $("#footerTable").show();
         $("#welcomeRow").text("Welcome");
         let flagRef = rtdb.ref(db, "/flag");
         console.log("here");
         rtdb.onValue(flagRef, ss =>
         {
-            alert(ss.val());
+            //alert(ss.val());
         })
     } else
     {
         $(".loginRow").show();
+        $("#logoutBtn").hide();
+        $("#changeUsernameBtn").hide();
+        $("#changeUsernameInput").hide();
         $("#footerTable").hide();
-        $("#chat").html("");
+        $("#chatTable").html("");
     }
 });
 
@@ -81,18 +96,26 @@ rtdb.onValue(rulesRef, ss =>
 
 rtdb.onValue(titleRef, ss =>
 {
-    while (chat.firstChild)
+    //let chatRef = rtdb.ref(db, "/chats/${chat}");
+    while (chatTable.firstChild)
     {
-        chat.removeChild(chat.firstChild);
+        chatTable.removeChild(chatTable.firstChild);
     }
 
-    for (const mesg in ss.val().chats)
+    for (const mesg in ss.val().chats[chat])
     {
         var row = document.createElement("tr");
-        let name = ss.val().chats[mesg]["email"];
-        let inputText = ss.val().chats[mesg]["inputText"];
-        row.appendChild(document.createTextNode(name + ": " + inputText));
-        chat.appendChild(row);
+        let mesgUid = ss.val().chats[chat][mesg]["uid"];
+        let inputText = ss.val().chats[chat][mesg]["inputText"];
+        let usrData = ss.val().users[mesgUid];
+        let name = document.createElement("td");
+        name.style.color = uid == mesgUid ? "green" : "blue";
+        name.innerHTML = usrData["username"];
+        row.appendChild(name);
+        let mesgCol = document.createElement("td");
+        mesgCol.innerHTML = inputText;
+        row.appendChild(mesgCol);
+        chatTable.appendChild(row);
     }
 });
 
@@ -100,10 +123,10 @@ rtdb.onValue(titleRef, ss =>
 
 $("#sendBtn").on('click', function ()
 {
-
+    let chatRef = rtdb.ref(db, `/chats/${chat}`);
     let inputText = document.querySelector('#sendText').value;
-    let mesg = { email, inputText };
-    rtdb.push(mesgRef, mesg);
+    let mesg = { uid, inputText };
+    rtdb.push(chatRef, mesg);
 
     document.querySelector('#sendText').value = "";
 
@@ -125,6 +148,8 @@ $("#regBtn").on("click", () =>
         let uid = somedata.user.uid;
         let userRoleRef = rtdb.ref(db, `/users/${uid}/roles/user`);
         rtdb.set(userRoleRef, true);
+        let usernameRef = rtdb.ref(db, `/users/${uid}/username`);
+        rtdb.set(usernameRef, email);
     }).catch(function (error)
     {
         // Handle Errors here.
