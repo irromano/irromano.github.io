@@ -34,6 +34,9 @@ let usr;
 const defaultChat = "main";
 let chat = defaultChat;
 
+// List of editable messages
+let mesgSet = {};
+
 $("#footerTable").hide();
 $("#chat").hide();
 $("#boardTable").hide();
@@ -114,14 +117,10 @@ rtdb.onValue(titleRef, ss =>
         let chatName = chatBoard;
         button.classList.add('chatBtn');
         button.textContent = chatName;
-        button.id = chatName + "Btn";
+        button.id = chatName;
         col.appendChild(button);
         row.appendChild(col);
         $("#boardTable").append(row);
-        $(`#${button.id}`).on("click", () => {
-            chat = chatName;
-            refreshChatMessages(ss);
-        })
     }
     let row = document.createElement("tr");
     let col = document.createElement("td");
@@ -141,18 +140,33 @@ rtdb.onValue(titleRef, ss =>
             let chatRef = rtdb.ref(db, `/chats/${newChatInput.value}`);
             let inputText = newChatInput.value;
             let mesg = { uid, inputText }
-            rtdb.set(chatRef, {inputText : mesg});
-
             newChatInput.value = "";
             chat = inputText;
-            refreshChatMessages(ss);
+            rtdb.set(chatRef, "");//{inputText : mesg});
         }
     })
 
+    // Get the element, add a click listener...
+    boardTable.addEventListener("click", function (e) {
+        // e.target is the clicked element!
+        // If it was a list item
+        //console.log(`Node type clicked is ${e.target.nodeName}`);
+        if (e.target && e.target.nodeName == "BUTTON") {
+            chat = e.target.id;
+            refreshChatMessages(ss);
+            // List item found!  Output the ID!
+            //console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
+        }
+    });
+
 });
 
+/*
+ * Helper function which refreshes the messages on the current chat.
+ */
 function refreshChatMessages(data)
 {
+    let editMesgCnt = 0;
     //let chatRef = rtdb.ref(db, "/chats/${chat}");
     while (chatTable.firstChild) {
         chatTable.removeChild(chatTable.firstChild);
@@ -162,31 +176,66 @@ function refreshChatMessages(data)
     for (const mesg in data.val().chats[chat]) {
         var row = document.createElement("tr");
         let mesgUid = data.val().chats[chat][mesg]["uid"];
+        let ownMesg = uid == mesgUid;
         let inputText = data.val().chats[chat][mesg]["inputText"];
         let usrData = data.val().users[mesgUid];
         let name = document.createElement("td");
-        name.style.color = uid == mesgUid ? "green" : "blue";
+        name.style.color = ownMesg ? "green" : "blue";
         name.innerHTML = usrData["username"];
         row.appendChild(name);
         let mesgCol = document.createElement("td");
         mesgCol.innerHTML = inputText;
         row.appendChild(mesgCol);
+        if (ownMesg) {
+
+            let editBtn = document.createElement("button");
+            editBtn.id = mesg;
+            editBtn.textContent = "edit";
+
+            let editCol = document.createElement("td");
+            let editText = document.createElement("input");
+            editText.id = "editText" + editMesgCnt.toString();
+            editText.hidden = true;
+
+            editMesgCnt++;
+
+            mesgSet[editMesgCnt] = editBtn.id;
+            editCol.appendChild(editBtn);
+            editCol.appendChild(editText);
+            row.appendChild(editCol);
+        }
         chatTable.appendChild(row);
     }
+    
+    chatTable.addEventListener("click", function (e) {
+
+        if (e.target && e.target.nodeName == "BUTTON") {
+            let textField = e.target.nextSibling;
+            let tempText = textField.value;
+            if (!textField.hidden && tempText) {
+                let chatRef = rtdb.ref(db, `/chats/${chat}/${e.target.id}/inputText/`);
+                rtdb.set(chatRef, tempText);
+            }
+            else if (textField.hidden) {
+                textField.hidden = false;
+            }
+        }
+    });
 }
 
 //Button Logic
 
 $("#sendBtn").on('click', function ()
 {
-    let chatRef = rtdb.ref(db, `/chats/${chat}`);
-    let inputText = document.querySelector('#sendText').value;
-    let mesg = { uid, inputText };
-    rtdb.push(chatRef, mesg);
+    let mesgText = document.querySelector('#sendText').value
+    if (mesgText) {
+        let chatRef = rtdb.ref(db, `/chats/${chat}`);
+        let inputText = mesgText;
+        let mesg = { uid, inputText };
+        rtdb.push(chatRef, mesg);
 
-    document.querySelector('#sendText').value = "";
-
-
+        document.querySelector('#sendText').value = "";
+    }
 });
 
 $("#regBtn").on("click", () =>
