@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>ChatApp2</title>
+    <title>HabibiChat</title>
     <style type="text/css">
         .auto-style1 {
             width: 100%;
@@ -61,6 +61,18 @@
             bottom: 0px;
         }
 
+        #boardTable{
+            position: absolute;
+            right: 5px;
+            top: 0px;
+        }
+
+        .chatBtn{
+            color: #008080;
+            width: 100px;
+            height: 100px;
+        }
+
         .auto-style13 {
             bottom: 38px;
             width: 755px;
@@ -81,7 +93,8 @@
     <div>
         <table class="auto-style1">
             <tr>
-                <td></td>
+                <td>
+                </td>
                 <td>
                     <div>
                         <table class="auto-style1" id="loginTable">
@@ -148,6 +161,10 @@
                     </div>
                 </td>
             </tr>
+        </table>
+    </div>
+    <div>
+        <table id="boardTable">
         </table>
     </div>
     <script src="node_modules\jquery\dist\jquery.min.js"></script>

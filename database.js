@@ -27,13 +27,16 @@ let auth = fbauth.getAuth(app);
 let db = rtdb.getDatabase(app);
 const titleRef = rtdb.ref(db, "/");
 const chatTable = document.querySelector("#chatTable");
+const boardTable = document.querySelector("#boardTable");
 let uid;
 let email;
 let usr;
-let chat;
+const defaultChat = "main";
+let chat = defaultChat;
 
 $("#footerTable").hide();
-//$("#chat").hide();
+$("#chat").hide();
+$("#boardTable").hide();
 
 let renderUser = function (userObj)
 {
@@ -54,7 +57,6 @@ let renderUser = function (userObj)
     uid = userObj["uid"];
     email = userObj["email"];
     usr = userObj["displayName"] ? userObj["displayName"] : email;
-    chat = "main"
 }
 
 fbauth.onAuthStateChanged(auth, user =>
@@ -65,6 +67,7 @@ fbauth.onAuthStateChanged(auth, user =>
         $(".loginRow").hide();
         $("#chatTable").show();
         $("#footerTable").show();
+        $("#boardTable").show();
         $("#welcomeRow").text("Welcome");
         let flagRef = rtdb.ref(db, "/flag");
         console.log("here");
@@ -80,6 +83,7 @@ fbauth.onAuthStateChanged(auth, user =>
         $("#changeUsernameInput").hide();
         $("#footerTable").hide();
         $("#chatTable").html("");
+        $("#boardTable").hide();
     }
 });
 
@@ -96,18 +100,70 @@ rtdb.onValue(rulesRef, ss =>
 
 rtdb.onValue(titleRef, ss =>
 {
+    refreshChatMessages(ss);
+
+    while (boardTable.firstChild) {
+        boardTable.removeChild(boardTable.firstChild);
+    }
+
+    /* for every chat in the app */
+    for (const chatBoard in ss.val().chats) {
+        let row = document.createElement("tr");
+        let col = document.createElement("td");
+        let button = document.createElement("button");
+        let chatName = chatBoard;
+        button.classList.add('chatBtn');
+        button.textContent = chatName;
+        button.id = chatName + "Btn";
+        col.appendChild(button);
+        row.appendChild(col);
+        $("#boardTable").append(row);
+        $(`#${button.id}`).on("click", () => {
+            chat = chatName;
+            refreshChatMessages(ss);
+        })
+    }
+    let row = document.createElement("tr");
+    let col = document.createElement("td");
+    let button = document.createElement("button");
+    let chatName = "+";
+    button.classList.add('chatBtn');
+    button.textContent = chatName;
+    button.id = "newChatBtn";
+    col.appendChild(button);
+    row.appendChild(col);
+    $("#boardTable").append(row);
+    let newChatInput = document.createElement("input");
+    $("#boardTable").append(newChatInput);
+
+    $(`#${button.id}`).on("click", () => {
+        if (newChatInput.value) {
+            let chatRef = rtdb.ref(db, `/chats/${newChatInput.value}`);
+            let inputText = newChatInput.value;
+            let mesg = { uid, inputText }
+            rtdb.set(chatRef, {inputText : mesg});
+
+            newChatInput.value = "";
+            chat = inputText;
+            refreshChatMessages(ss);
+        }
+    })
+
+});
+
+function refreshChatMessages(data)
+{
     //let chatRef = rtdb.ref(db, "/chats/${chat}");
-    while (chatTable.firstChild)
-    {
+    while (chatTable.firstChild) {
         chatTable.removeChild(chatTable.firstChild);
     }
 
-    for (const mesg in ss.val().chats[chat])
-    {
+    /* for every message in the current chat */
+    for (const mesg in data.val().chats[chat]) {
         var row = document.createElement("tr");
-        let mesgUid = ss.val().chats[chat][mesg]["uid"];
-        let inputText = ss.val().chats[chat][mesg]["inputText"];
-        let usrData = ss.val().users[mesgUid];
+        let mesgUid = data.val().chats[chat][mesg]["uid"];
+        let inputText = data.val().chats[chat][mesg]["inputText"];
+        let usrData = data.val().users[mesgUid];
         let name = document.createElement("td");
         name.style.color = uid == mesgUid ? "green" : "blue";
         name.innerHTML = usrData["username"];
@@ -117,7 +173,7 @@ rtdb.onValue(titleRef, ss =>
         row.appendChild(mesgCol);
         chatTable.appendChild(row);
     }
-});
+}
 
 //Button Logic
 
