@@ -31,6 +31,7 @@ const boardTable = document.querySelector("#boardTable");
 let uid;
 let email;
 let usr;
+let admin;
 const defaultChat = "main";
 let chat = defaultChat;
 
@@ -38,7 +39,7 @@ let chat = defaultChat;
 let mesgSet = {};
 
 $("#footerTable").hide();
-$("#chat").hide();
+$("#chatTable").hide();
 $("#boardTable").hide();
 
 let renderUser = function (userObj)
@@ -60,6 +61,8 @@ let renderUser = function (userObj)
     uid = userObj["uid"];
     email = userObj["email"];
     usr = userObj["displayName"] ? userObj["displayName"] : email;
+    let roleRef = rtdb.ref(db, `/users/${uid}/roles/admin`);
+    
 }
 
 fbauth.onAuthStateChanged(auth, user =>
@@ -87,6 +90,7 @@ fbauth.onAuthStateChanged(auth, user =>
         $("#footerTable").hide();
         $("#chatTable").html("");
         $("#boardTable").hide();
+        $("#chatTable").hide();
     }
 });
 
@@ -186,7 +190,7 @@ function refreshChatMessages(data)
         let mesgCol = document.createElement("td");
         mesgCol.innerHTML = inputText;
         row.appendChild(mesgCol);
-        if (ownMesg) {
+        if (ownMesg || admin) {
 
             let editBtn = document.createElement("button");
             editBtn.id = mesg;
@@ -253,6 +257,8 @@ $("#regBtn").on("click", () =>
         let uid = somedata.user.uid;
         let userRoleRef = rtdb.ref(db, `/users/${uid}/roles/user`);
         rtdb.set(userRoleRef, true);
+        let adminRoleRef = rtdb.ref(db, `/users/${uid}/roles/admin`);
+        rtdb.set(userRoleRef, false);
         let usernameRef = rtdb.ref(db, `/users/${uid}/username`);
         rtdb.set(usernameRef, email);
     }).catch(function (error)
