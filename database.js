@@ -74,7 +74,7 @@ fbauth.onAuthStateChanged(auth, user =>
         $("#chatTable").show();
         $("#footerTable").show();
         $("#boardTable").show();
-        $("#welcomeRow").text("Welcome");
+        $("#welcomeRow").text("Welcome to HabibiChat");
         let flagRef = rtdb.ref(db, "/flag");
         console.log("here");
         rtdb.onValue(flagRef, ss =>
